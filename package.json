@@ -10,20 +10,17 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "element-plus": "^2.2.15",
+    "mars3d": "^3.4.6",
+    "sass-loader": "^13.0.2",
     "vue": "^3.2.13",
     "vue-cesium": "^3.0.18",
     "vue-router": "^4.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
     "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3",
-    "node-sass": "^7.0.1",
-    "sass-loader": "^13.0.2"
+    "node-sass": "^7.0.1"
   },
   "eslintConfig": {
     "root": true,
@@ -31,12 +28,9 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
+      "plugin:vue/vue3-essential"
     ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser"
-    },
+    "parserOptions": {},
     "rules": {}
   },
   "browserslist": [
