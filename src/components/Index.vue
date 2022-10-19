@@ -1,123 +1,83 @@
 <template>
   <div class="hello">
     <div class="demo-nav_panel">
-      <el-button size="middle" class="demo-nav_item" v-for="(nav, key) in navs" :key="key" @click="ClickFun"
-                 v-bind:type="selIndex == key ? 'primary' : ''">{{ nav }}
+      <el-button size="small" class="demo-nav_item" v-for="(nav, key) in navs" :key="key" @click="ClickFun"
+                 v-bind:type="selIndex === key ? 'primary' : ''">{{ nav }}
       </el-button>
     </div>
-    <vc-viewer :show-credit="false" ref="vcViewer" @ready="onViewerReady"></vc-viewer>
+    <div id="cesiumContainer"></div>
   </div>
 </template>
 
 <script>
-import {
-  ref,
-  reactive,
-  toRefs,
-  getCurrentInstance,
-  onBeforeMount,
-  onMounted,
-  onBeforeUpdate,
-  onUpdated,
-  onBeforeUnmount,
-  onUnmounted,
-  watch,
-  computed
-} from "vue";
 
 export default {
-  name: 'HelloWorld',
+  name: 'mapPlot',
   props: {
     msg: String
   },
-  setup(props, context) {
-    //获取当前实例
-    const {ctx, proxy} = getCurrentInstance()
-    console.log(ctx)
-    let selIndex = ref(null);
-    const navs = ["沙盘", "导入", "实时轨迹"];
-    let cesium;
-    const vcViewer = ref(null);
-    const onViewerReady = ({Cesium, viewer}) => {
-      cesium = Cesium;
-    }
-    // 定义响应式data 数据
-    const state = reactive({})
-    console.log("*******end reactive******")
-    // 定义方法
-    const methods = {
-      async dealData(firstResData) {
-        if (firstResData.status == "finished") {
-          state.collection_data = firstResData.data
-          state.colection_id = firstResData.id
-          // await get(api + state.colection_id).then((resData) => {
-          //   state.layoutX = resData.x
-          //   state.layoutY = resData.y
-          //   console.log("state.layoutX" + state.layoutX)
-          //   console.log("state.layoutY" + state.layoutY)
-          // })
-        }
-      },
-      // ***********async/await 实现请求同步功能**************
-      async refreshData() {
-        // await get(api).then(firstResData => {
-        //   console.log("state.curStatus=" + firstResData.status)
-        //   methods.dealData(firstResData)
-        // }).catch(() => {
-        //
-        // })
-      },
-    }
-    onBeforeMount(() => {
-      // dom 挂载前
-      console.log("*******onBeforeMount******")
-    })
-    onMounted(async () => {
-      //dom 挂载后
-      console.log("*******onMounted******")
-      state.collection_id = proxy.$route.query.id
-      await methods.init()
-    })
-    onBeforeUpdate(() => {
-      //对响应式data数据有更新， 更新前
-      console.log("*******onBeforeUpdate******")
-    })
-    onUpdated(() => {
-      //对响应式data数据有更新， 更新后
-      console.log("*******onUpdated******")
-    })
-    onBeforeUnmount(() => {
-      //销毁页面组件前， 即关闭
-      console.log("*******onBeforeUnmount******")
-    })
-    onUnmounted(() => {
-      //销毁后
-      console.log("*******onUnmounted******")
-    })
-
+  //vue2写法
+  data() {
     return {
-      ...toRefs(state),
-      ...methods,
-      onViewerReady
+      navs: ["沙盘", "导入", "实时轨迹"],
+      selIndex: null
     }
   },
   mounted() {
-    {
-      this.$refs.vcViewer.creatingPromise.then()
-    }
+    this.init()
+  },
+  methods: {
+    ClickFun(index) {
+
+    },
+
+    init() {
+      Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(
+          //-70, // 东
+          //0.0, // 南
+          //0, // 西
+          //90.0, // 北
+          //更改为中国区域的初始视角
+          72,
+          10,
+          135,
+          53
+      );
+      Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.2;
+      // const Cesium = this.Cesium
+      this.viewer = new Cesium.Viewer("cesiumContainer", {
+        geocoder: false,
+        // baseLayerPicker: false,
+        selectionIndicator: false,
+        baseLayerPicker: false,
+        animation: false,
+        navigationHelpButton: false,
+        infoBox: false,
+        timeline: false,
+
+        fullscreenButton: false,
+        // sceneMode: Cesium.SceneMode.SCENE2D,
+        // 连接地图服务
+        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+          // url: window.mapUrl + ":9109/map/?z={z}&x={x}&y={y}",
+          url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+          tilingScheme: new Cesium.WebMercatorTilingScheme(),
+          maximumLevel: 7,
+          show: false
+        })
+      });
+      // this.utils.transformTime(this, window.viewer); //时间转换
+      // this.utils.setView(window.viewer);
+      this.viewer.cesiumWidget.creditContainer.style.display = "none";
+      //是否开启抗锯齿
+      this.viewer.scene.fxaa = true;
+      this.viewer.scene.debugShowFramesPerSecond = false;
+      this.viewer.scene.postProcessStages.fxaa.enabled = true;
+
+      let handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+      let self = this;
+    },
   }
-  //vue2写法
-  // data() {
-  //   return {
-  //     navs: ["沙盘", "导入", "实时轨迹"],
-  //     selIndex:null
-  //   }
-  // },
-  // methods:{
-  //   ClickFun(index){
-  //
-  //   }
-  // }
 }
 </script>
 
@@ -126,6 +86,15 @@ export default {
 .hello {
   height: 100%;
   width: 100%;
+
+  #cesiumContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
 
   .demo-nav_panel {
     position: absolute;
@@ -136,7 +105,7 @@ export default {
     .demo-nav_item {
       display: flex;
       margin: 20px auto;
-      width: 80px;
+      width: 60px;
     }
   }
 }
