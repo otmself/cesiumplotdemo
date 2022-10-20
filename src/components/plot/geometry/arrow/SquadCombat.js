@@ -3,7 +3,7 @@
  * @desc 分队战斗行动
  * @Inherits AttackArrow
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { SQUAD_COMBAT } from "../../utils/PlotTypes";
 import AttackArrow from "./AttackArrow";
 import * as PlotUtils from "../../utils/Utils";

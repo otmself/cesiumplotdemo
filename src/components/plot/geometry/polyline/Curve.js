@@ -2,7 +2,8 @@
  * Created by leedon1990s on 2020/12/26.
  * @desc 标绘曲线算法
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { CURVE } from "../../utils/PlotTypes";
 import * as PlotUtils from "../../utils/Utils";
 class Curve {

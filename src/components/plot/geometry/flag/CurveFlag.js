@@ -2,7 +2,7 @@
  * Created by FDD on 2017/9/13.
  * @desc 曲线旗标
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { CURVEFLAG } from "../../utils/PlotTypes";
 import { getBezierPoints } from "../../utils/Utils";
 class CurveFlag {

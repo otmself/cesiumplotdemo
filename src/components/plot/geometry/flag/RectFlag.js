@@ -2,7 +2,7 @@
  * Created by FDD on 2017/9/13.
  * @desc 直角旗标（使用两个控制点直接创建直角旗标）
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { RECTFLAG } from "../../utils/PlotTypes";
 class RectFlag {
   constructor(coordinates, points, params) {

@@ -3,7 +3,7 @@
  * @desc 多边形
  * @Inherits ol.geom.Polygon
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { POLYGON } from "../../utils/PlotTypes";
 class Polygon {
   constructor(coordinates, points, params) {

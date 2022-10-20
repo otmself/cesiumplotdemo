@@ -2,7 +2,7 @@
  * Created by FDD on 2017/5/22.
  * @desc 标绘画圆算法，继承面要素相关方法和属性
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { ELLIPSE } from "../../utils/PlotTypes";
 import * as Constants from "../../Constants";
 import * as PlotUtils from "../../utils/Utils";

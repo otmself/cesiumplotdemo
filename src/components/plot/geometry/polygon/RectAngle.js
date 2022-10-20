@@ -3,7 +3,7 @@
  * @desc 规则矩形
  * @Inherits ol.geom.Polygon
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { RECTANGLE } from "../../utils/PlotTypes";
 class RectAngle {
   constructor(coordinates, points, params) {

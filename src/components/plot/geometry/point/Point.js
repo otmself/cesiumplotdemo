@@ -2,7 +2,7 @@
  * Created by leedon1990s on 2020/12/26.
  * @desc 点要素
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { POINT } from "../../utils/PlotTypes";
 class Point {
   constructor(coordinates, point, params) {

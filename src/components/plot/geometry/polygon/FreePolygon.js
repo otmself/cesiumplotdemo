@@ -3,7 +3,7 @@
  * @desc 自由面
  * @Inherits ol.geom.Polygon
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { FREE_POLYGON } from "../../utils/PlotTypes";
 class FreePolygon {
   constructor(coordinates, points, params) {

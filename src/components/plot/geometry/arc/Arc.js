@@ -2,7 +2,7 @@
  * Created by leedon1990s on 2020/12/26.
  * @desc 标绘画弓形算法，继承线要素相关方法和属性
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { ARC } from "../../utils/PlotTypes";
 import * as PlotUtils from "../../utils/Utils";
 class Arc {

@@ -2,7 +2,7 @@
  * Created by FDD on 2017/5/24.
  * @desc 细直箭头
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { STRAIGHT_ARROW } from "../../utils/PlotTypes";
 import * as PlotUtils from "../../utils/Utils";
 class StraightArrow {

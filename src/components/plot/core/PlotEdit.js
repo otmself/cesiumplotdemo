@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { BASE_HELP_CONTROL_POINT_ID, BASE_HELP_HIDDEN } from "../Constants";
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+
+import * as Cesium from "../../../../public/Cesium/Cesium";
 
 class PlotEdit {
     constructor(viewer) {

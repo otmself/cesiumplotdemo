@@ -2,7 +2,7 @@
  * Created by leedon1990s on 2020/12/26.
  * @desc PlotDraw
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../public/Cesium/Cesium";
 
 import { BASE_LAYERNAME } from "../Constants";
 import { createDataSource } from "../utils/DataSourceUtil";

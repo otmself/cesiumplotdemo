@@ -2,7 +2,7 @@
  * Created by leedon1990s on 2020/12/28.
  * @desc 自由线
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { FREEHANDLINE } from "../../utils/PlotTypes";
 class FreeHandLine {
   constructor(coordinates, points, params) {

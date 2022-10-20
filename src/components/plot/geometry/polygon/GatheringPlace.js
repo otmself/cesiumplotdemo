@@ -3,7 +3,7 @@
  * @desc 集结地
  * @Inherits ol.geom.Polygon
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { GATHERING_PLACE } from "../../utils/PlotTypes";
 import * as PlotUtils from "../../utils/Utils";
 import * as Constants from "../../Constants";

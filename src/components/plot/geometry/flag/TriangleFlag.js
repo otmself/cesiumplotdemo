@@ -2,7 +2,7 @@
  * Created by FDD on 2017/9/13.
  * @desc 三角旗标（使用两个控制点直接创建三角旗标）
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { TRIANGLEFLAG } from "../../utils/PlotTypes";
 class TriangleFlag {
   constructor(coordinates, points, params) {

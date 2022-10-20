@@ -3,7 +3,7 @@
  * @desc 弓形
  * @Inherits ol.geom.Polygon
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { LUNE } from "../../utils/PlotTypes";
 import * as Constants from "../../Constants";
 import * as PlotUtils from "../../utils/Utils";

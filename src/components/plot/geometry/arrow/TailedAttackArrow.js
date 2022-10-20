@@ -3,7 +3,7 @@
  * @desc 进攻方向（尾）
  * @Inherits AttackArrow
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { TAILED_ATTACK_ARROW } from "../../utils/PlotTypes";
 import AttackArrow from "./AttackArrow";
 import * as PlotUtils from "../../utils/Utils";

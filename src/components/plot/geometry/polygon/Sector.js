@@ -3,7 +3,7 @@
  * @desc 扇形
  * @Inherits ol.geom.Polygon
  */
-import * as Cesium from "cesium/Build/Cesium/Cesium";
+import * as Cesium from "../../../../../public/Cesium/Cesium";
 import { SECTOR } from "../../utils/PlotTypes";
 import * as PlotUtils from "../../utils/Utils";
 class Sector {
