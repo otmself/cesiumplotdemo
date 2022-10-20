@@ -79,7 +79,7 @@ export default {
           name: "集结地",
           fun: "GatheringPlace"
         }, {
-          name: "双箭头",
+          name: "钳击",
           fun: "DoubleArrow"
         }, {
           name: "细直箭头",
@@ -191,7 +191,7 @@ export default {
       });
       let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
       // 左键单击事件：
-      self.handler.setInputAction(function (e) {
+      handler.setInputAction(function (e) {
         let pick = viewer.scene.pick(e.position);
         if (Cesium.defined(pick)) {
           // && pick.id.plot
@@ -237,7 +237,7 @@ export default {
     text-align: center;
 
     .demo-nav_item {
-      margin: 20px auto;
+      margin: 20px 2px;
       width: 80px;
     }
   }
