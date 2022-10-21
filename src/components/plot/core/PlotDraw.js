@@ -164,7 +164,7 @@ class PlotDraw {
    * @param type
    * @param params
    */
-  active(type, params = {}) {
+  active(type, params = {}, fun) {
     let that = this;
     that.disActive();
     that.plotType = type;
@@ -198,6 +198,7 @@ class PlotDraw {
         that.plot.setPoints(that.points);
         if (that.plot.getPlotType() === PlotTypes.POINT) {
           that.handler.destroy();
+          fun(1);
         }
       } else {
         if (!that.plot.freehand) {
@@ -212,9 +213,11 @@ class PlotDraw {
         that.plot.setPoints(that.points);
         if (that.plot.fixPointCount === that.plot.getPointCount()) {
           that.handler.destroy();
+          fun(1);
         }
         if (that.plot.freehand) {
           that.handler.destroy();
+          fun(1);
         }
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -234,6 +237,8 @@ class PlotDraw {
     that.handler.setInputAction(function(e) {
       if (that.handler) {
         that.handler.destroy();
+        fun(1);
+        // that.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 
@@ -242,6 +247,7 @@ class PlotDraw {
     that.handler.setInputAction(function(e) {
       if (that.handler) {
         that.handler.destroy();
+        fun(1);
       }
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
@@ -284,6 +290,9 @@ class PlotDraw {
       }
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
   }
+
+
+
 
   /**
    * 取消激活状态

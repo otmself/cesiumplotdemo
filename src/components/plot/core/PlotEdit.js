@@ -89,7 +89,7 @@ class PlotEdit {
             // 左键单击事件：针对控制点的操作
             // eslint-disable-next-line no-unused-vars
             that.handle.setInputAction(function (e) {
-                var pick = that.viewer.scene.pick(e.position);
+                let pick = that.viewer.scene.pick(e.position);
                 if (Cesium.defined(pick)) {
                     if (pick.id && pick.id.isControl) {
                         that.viewer.scene.canvas.style.cursor = "move";
@@ -102,7 +102,7 @@ class PlotEdit {
             // 左键弹起事件
             // eslint-disable-next-line no-unused-vars
             that.handle.setInputAction(function (e) {
-                var pick = that.viewer.scene.pick(e.position);
+                let pick = that.viewer.scene.pick(e.position);
                 if (Cesium.defined(pick)) {
                     if (pick.id && pick.id.isControl) {
                         that.viewer.scene.canvas.style.cursor = "default";
@@ -115,7 +115,7 @@ class PlotEdit {
             // 移动事件：
             // eslint-disable-next-line no-unused-vars
             that.handle.setInputAction(function (e) {
-                var pick = that.viewer.scene.pick(e.position);
+                 let pick = that.viewer.scene.pick(e.endPosition);
                 if (Cesium.defined(pick)) {
                     if (pick.id && pick.id.isControl && that.controlPointSelected) {
                         that.viewer.scene.canvas.style.cursor = "move";

@@ -112,16 +112,8 @@ export default {
           name: "曲线标志旗",
           fun: "CurveFlag"
         }, {
-          name: "A318",
-          fun: "318",
-          custom: true
-        }, {
-          name: "A319",
-          fun: "319",
-          custom: true
-        }, {
-          name: "A380",
-          fun: "380",
+          name: "飞行轨迹",
+          fun: "fly",
           custom: true
         }, {
           name: "地空目标",
@@ -161,10 +153,10 @@ export default {
         // baseLayerPicker: false,
         selectionIndicator: false,
         baseLayerPicker: false,
-        animation: false,
+        animation: true,
         navigationHelpButton: false,
         infoBox: false,
-        timeline: false,
+        timeline: true,
 
         fullscreenButton: false,
         // sceneMode: Cesium.SceneMode.SCENE2D,
@@ -190,6 +182,7 @@ export default {
         zoomToExtent: false
       });
       let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
       // 左键单击事件：
       handler.setInputAction(function (e) {
         let pick = viewer.scene.pick(e.position);
@@ -204,10 +197,91 @@ export default {
       }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     },
     drawPlot(fun) {
-      this.selFun = fun.fun
+      this.selFun = fun.fun;
+      let self = this;
       if (fun.custom) {
+        if (fun.fun == 'fly') {
+          let points = [
+            [80.875854, 35.496456],
+            [80.445415, 35.426961],
+            [80.364565, 35.620685],
+            [80.786978, 35.829093]
+          ]
+          let curvePath = Utils.getCurvePoints(0.3, points);
+          let range = [80.875854, 35.496456, 80.445415, 35.426961, 80.364565, 35.620685, 80.786978, 35.829093];
+          range = Cesium.Rectangle.fromCartesianArray(Cesium.Cartesian3.fromDegreesArray(range));
+          let boundingSphere = Cesium.BoundingSphere.fromRectangle3D(range);
+          viewer.camera.flyToBoundingSphere(boundingSphere, {
+            offset: new Cesium.HeadingPitchRange(0, -90, 100000)
+          })
+          for (let i = 0; i < curvePath.length; i++) {
+            curvePath[i] = curvePath[i].concat([7950]);
+            // if (i > 10 && i < curvePath.length - 10) {
+            //   height = height + 10;
+            // }
+          }
+          const timeStepInSeconds = 30;
+          const totalSeconds = timeStepInSeconds * (curvePath.length - 1);
+          const start = Cesium.JulianDate.fromIso8601("2020-03-09T23:10:00Z");
+          const stop = Cesium.JulianDate.addSeconds(
+              start,
+              totalSeconds,
+              new Cesium.JulianDate()
+          );
+
+          const positionProperty = new Cesium.SampledPositionProperty();
+          for (let i = 0; i < curvePath.length; i++) {
+            const dataPoint = curvePath[i];
+            const time = Cesium.JulianDate.addSeconds(
+                start,
+                i * timeStepInSeconds,
+                new Cesium.JulianDate()
+            );
+            const position = Cesium.Cartesian3.fromDegrees(
+                dataPoint[0],
+                dataPoint[1],
+                dataPoint[2]
+            );
+            positionProperty.addSample(time, position);
+          }
+
+          const airplaneEntity = viewer.entities.add({
+            availability: new Cesium.TimeIntervalCollection([
+              new Cesium.TimeInterval({start: start, stop: stop})
+            ]),
+            position: positionProperty,
+            // Attach the 3D model instead of the green point.
+            model: {
+              uri: "./model/Fighter.glb",
+              scale: 10,
+              minimumPixelSize: 10,
+              maximumScale: 20,
+            },
+            // Automatically compute the orientation from the position.
+            orientation: new Cesium.VelocityOrientationProperty(positionProperty),
+            // orientation: new Cesium.CallbackProperty(function() {
+            //   //console.log(this.getValue(viewer.clock.currentTime));
+            //   return new Cesium.VelocityOrientationProperty(positionProperty);
+            // }),
+            path: new Cesium.PathGraphics({width: 1})
+          });
+
+          viewer.clock.startTime = start.clone();
+          viewer.clock.stopTime = stop.clone();
+          viewer.clock.currentTime = start.clone();
+          //viewer.timeline.zoomTo(start, stop);
+          // Speed up the playback speed 50x.
+          viewer.clock.multiplier = 10;
+          // Start playing the scene.
+          viewer.clock.shouldAnimate = true;
+          viewer.trackedEntity = airplaneEntity;
+        }
       } else {
-        plot.plotDraw.active(fun.fun)
+        plot.plotDraw.active(fun.fun, {}, function (data) {
+          if (data == 1) {
+            self.selFun = null;
+          }
+        })
       }
     }
   }
