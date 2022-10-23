@@ -21,6 +21,8 @@ import * as Cesium from "../../public/Cesium/Cesium";
 import "../../public/Cesium/Widgets/widgets.css";
 import CesiumPlot from "./plot/index";
 import * as Utils from "./plot/utils/Utils";
+import * as PlotTypes from "@/components/plot/utils/PlotTypes";
+import {MathDistance} from "./plot/utils/Utils";
 // eslint-disable-next-line no-unused-vars
 
 
@@ -141,10 +143,10 @@ export default {
           //0, // 西
           //90.0, // 北
           //更改为中国区域的初始视角
-          72,
-          10,
-          135,
-          53
+          80,
+          35,
+          81,
+          36
       );
       Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.2;
       // const Cesium = this.Cesium
@@ -215,7 +217,7 @@ export default {
             offset: new Cesium.HeadingPitchRange(0, -90, 100000)
           })
           for (let i = 0; i < curvePath.length; i++) {
-            curvePath[i] = curvePath[i].concat([7950]);
+            curvePath[i] = curvePath[i].concat([5000]);
             // if (i > 10 && i < curvePath.length - 10) {
             //   height = height + 10;
             // }
@@ -263,7 +265,7 @@ export default {
             //   //console.log(this.getValue(viewer.clock.currentTime));
             //   return new Cesium.VelocityOrientationProperty(positionProperty);
             // }),
-            path: new Cesium.PathGraphics({width: 1})
+            path: new Cesium.PathGraphics({width: 1, material: Cesium.Color.YELLOW})
           });
 
           viewer.clock.startTime = start.clone();
@@ -274,7 +276,84 @@ export default {
           viewer.clock.multiplier = 10;
           // Start playing the scene.
           viewer.clock.shouldAnimate = true;
-          viewer.trackedEntity = airplaneEntity;
+          // viewer.trackedEntity = airplaneEntity;
+          self.selFun = null;
+        }
+        if (fun.fun == 'GroundLinkSky') {
+          const airplaneEntity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(80, 35.1, 5000),
+            // Attach the 3D model instead of the green point.
+            model: {
+              uri: "./model/Fighter.glb",
+              scale: 100,
+            },
+          });
+          const tigerEntity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(80, 35, 0),
+            // Attach the 3D model instead of the green point.
+            model: {
+              uri: "./model/Tiger.glb",
+              scale: 1000
+            },
+          });
+
+          // viewer.trackedEntity = tigerEntity;
+          viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(80.20, 34.95, 16000),
+            orientation: {
+              heading: -45,
+              pitch: -120,
+              roll: 0
+            },
+            duration: 1
+          })
+          let handler = new Cesium.ScreenSpaceEventHandler(
+              viewer.scene.canvas
+          );
+          let ellipsoid = viewer.scene.globe.ellipsoid;
+          //是否开始连线
+          let isLink = false
+          let linkPosition = []
+          let dynamicPositions = new Cesium.CallbackProperty(() => {
+            return linkPosition;
+          }, false)
+          handler.setInputAction(function (e) {
+            let pick = viewer.scene.pick(e.position);
+            if (pick && Cesium.defined(pick) && pick.id) {
+              const selEntity = pick.id;
+              selEntity.model.silhouetteColor = Cesium.Color.yellowBright;
+              selEntity.model.silhouetteSize = 2;
+              if (!isLink) {
+                isLink = true;
+                linkPosition.push(pick.id.position.getValue());
+                viewer.entities.add(
+                    new Cesium.Entity({
+                      polyline: {
+                        positions: dynamicPositions,
+                        width: 2,
+                        // arcType: Cesium.ArcType.RHUMB,
+                        // clampToGround: true,
+                        material: Cesium.Color.RED, //获取或设置折线的表面外观
+                        // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                      }
+                    })
+                )
+                handler.setInputAction(function (e) {
+                  let pick = viewer.scene.pick(e.endPosition);
+                  let cartesian = viewer.camera.pickEllipsoid(e.endPosition, ellipsoid);
+                  if (cartesian) {
+                    //将笛卡尔三维坐标转为地图坐标（弧度）
+                    let cartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(cartesian);
+                    //将地图坐标（弧度）转为十进制的度数
+                    linkPosition.push(cartesian);
+                  }
+                }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+              } else {
+                isLink = false
+                handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+              }
+            }
+          }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
         }
       } else {
         plot.plotDraw.active(fun.fun, {}, function (data) {
