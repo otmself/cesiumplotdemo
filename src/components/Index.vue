@@ -305,7 +305,7 @@ export default {
               pitch: -120,
               roll: 0
             },
-            duration: 1
+            duration: 0
           })
           let handler = new Cesium.ScreenSpaceEventHandler(
               viewer.scene.canvas
@@ -315,7 +315,7 @@ export default {
           let isLink = false
           let linkPosition = []
           let dynamicPositions = new Cesium.CallbackProperty(() => {
-            return linkPosition;
+            return Cesium.Cartesian3.fromDegreesArrayHeights(linkPosition);
           }, false)
           handler.setInputAction(function (e) {
             let pick = viewer.scene.pick(e.position);
@@ -325,28 +325,68 @@ export default {
               selEntity.model.silhouetteSize = 2;
               if (!isLink) {
                 isLink = true;
-                linkPosition.push(pick.id.position.getValue());
+                let cartographic = ellipsoid.cartesianToCartographic(pick.id.position.getValue());
+                let lat = Cesium.Math.toDegrees(cartographic.latitude);
+                let lng = Cesium.Math.toDegrees(cartographic.longitude);
+                let alt = cartographic.height;
+                linkPosition = [lng, lat, alt];
                 viewer.entities.add(
                     new Cesium.Entity({
                       polyline: {
                         positions: dynamicPositions,
-                        width: 2,
-                        // arcType: Cesium.ArcType.RHUMB,
+                        width: 5,
+                        arcType: Cesium.ArcType.RHUMB,
                         // clampToGround: true,
-                        material: Cesium.Color.RED, //获取或设置折线的表面外观
+                        material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.RED)
                         // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                       }
                     })
                 )
-                handler.setInputAction(function (e) {
-                  let pick = viewer.scene.pick(e.endPosition);
-                  let cartesian = viewer.camera.pickEllipsoid(e.endPosition, ellipsoid);
-                  if (cartesian) {
-                    //将笛卡尔三维坐标转为地图坐标（弧度）
-                    let cartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(cartesian);
-                    //将地图坐标（弧度）转为十进制的度数
-                    linkPosition.push(cartesian);
+                handler.setInputAction(function (move) {
+                  //获取相机射线
+                  let ray = viewer.scene.camera.getPickRay(move.endPosition);
+                  //根据射线和场景求出在球面中的笛卡尔坐标
+                  let movepick = viewer.scene.globe.pick(ray,viewer.scene);
+                  //获取该浏览器坐标的顶部数据
+                  let feature = viewer.scene.pick(move.endPosition);
+                  // console.log(feature);
+                  let cartesian = viewer.scene.pickPosition(move.endPosition);
+                  if (feature == undefined && movepick) {
+                    let cartesian = Cesium.Ellipsoid.WGS84.cartesianToCartographic(movepick);
+                    let mlon = Cesium.Math.toDegrees(cartesian.longitude);
+                    let mlat = Cesium.Math.toDegrees(cartesian.latitude);
+                    let mMouseHeight = Cesium.Math.toDegrees(cartesian.height);
+                    linkPosition = [...[linkPosition[0], linkPosition[1], linkPosition[2]], ...[mlon, mlat, mMouseHeight]];
                   }
+                  else{
+                    if (Cesium.defined(cartesian) ){
+                      //如果对象已定义，将度转为经纬度
+                      let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+                      let mlon = Cesium.Math.toDegrees(cartographic.longitude);
+                      let mlat = Cesium.Math.toDegrees(cartographic.latitude);
+                      let mMouseHeight = cartographic.height;//模型高度
+
+                      linkPosition = [...[linkPosition[0], linkPosition[1], linkPosition[2]], ...[mlon, mlat, mMouseHeight]];
+                    }
+                  }
+                  //
+                  // let movepick = viewer.scene.pick(move.endPosition);
+                  // let cartesian = viewer.camera.pickEllipsoid(move.endPosition, ellipsoid);
+                  // if (cartesian) {
+                  //   //将笛卡尔三维坐标转为地图坐标（弧度）
+                  //   let ecartographic = ellipsoid.cartesianToCartographic(cartesian);
+                  //   let elat = Cesium.Math.toDegrees(ecartographic.latitude);
+                  //   let elng = Cesium.Math.toDegrees(ecartographic.longitude);
+                  //   let ealt = ecartographic.height;
+                  //   if (movepick && Cesium.defined(movepick) && movepick.id) {
+                  //     let targetcartographic = ellipsoid.cartesianToCartographic(movepick.id.position.getValue())
+                  //     elat = Cesium.Math.toDegrees(targetcartographic.latitude);
+                  //     elng = Cesium.Math.toDegrees(targetcartographic.longitude);
+                  //     ealt = targetcartographic.height;
+                  //   }
+                  //   // linkPosition = [...[linkPosition[0], linkPosition[1], linkPosition[2]], ...[elng, elat, ealt]];
+                  //   //将地图坐标（弧度）转为十进制的度数
+                  // }
                 }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
               } else {
                 isLink = false
