@@ -12,6 +12,21 @@
         </el-button>
       </div>
     </transition>
+    <transition name="el-zoom-in-top">
+      <div class="demo-menu_panel demo-update_panel" v-show="selIndex == 1">
+        <el-upload
+            class="upload-demo"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            :on-change="changeFile"
+            :file-list="fileList"
+            :show-file-list="false"
+            :auto-upload="false">
+          <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+        </el-upload>
+      </div>
+    </transition>
     <div id="cesiumContainer"></div>
   </div>
 </template>
@@ -21,6 +36,7 @@ import * as Cesium from "../../public/Cesium/Cesium";
 import "../../public/Cesium/Widgets/widgets.css";
 import CesiumPlot from "./plot/index";
 import * as Utils from "./plot/utils/Utils";
+import "./plot/utils/PolylineTrailLinkMaterialProperty"
 import * as PlotTypes from "@/components/plot/utils/PlotTypes";
 import {MathDistance} from "./plot/utils/Utils";
 // eslint-disable-next-line no-unused-vars
@@ -122,8 +138,72 @@ export default {
           fun: "GroundLinkSky",
           custom: true
         }],
+      fileList: [],
       selIndex: null,
       selFun: null,
+      importDatas: [
+        {
+          lon: 80.226887,
+          lat: 31.277297,
+          height: 0,
+          type: "Tiger",
+          name: "坦克A",
+          angle: 70,
+          scale: 1000,
+          id: "1"
+        },
+        {
+          lon: 80.393613,
+          lat: 31.185404,
+          height: 0,
+          type: "Tiger",
+          name: "坦克B",
+          angle: 90,
+          scale: 1000,
+          id: "2"
+        },
+        {
+          lon: 80.233171,
+          lat: 31.280754,
+          height: 0,
+          type: "Tiger",
+          name: "坦克C",
+          angle: 40,
+          scale: 1000,
+          id: "3"
+        },
+        {
+          lon: 80.3769,
+          lat: 31.174776,
+          height: 5800,
+          type: "Fighter",
+          name: "战机A",
+          angle: 100,
+          scale: 100,
+          id: "4"
+        },
+        {
+          lon: 80.384661,
+          lat: 31.291123,
+          height: 8000,
+          type: "Fighter",
+          name: "战机B",
+          angle: 70,
+          scale: 100,
+          id: "5"
+        },
+        {
+          lon: 80.146071,
+          lat: 31.326418,
+          height: 7000,
+          type: "Fighter",
+          name: "战机C",
+          angle: 20,
+          scale: 100,
+          id: "6"
+        }
+      ],
+
     }
   },
   mounted() {
@@ -255,9 +335,9 @@ export default {
             // Attach the 3D model instead of the green point.
             model: {
               uri: "./model/Fighter.glb",
-              scale: 10,
-              minimumPixelSize: 10,
-              maximumScale: 20,
+              scale: 100,
+              minimumPixelSize: 100,
+              maximumScale: 200,
             },
             // Automatically compute the orientation from the position.
             orientation: new Cesium.VelocityOrientationProperty(positionProperty),
@@ -334,11 +414,13 @@ export default {
                     new Cesium.Entity({
                       polyline: {
                         positions: dynamicPositions,
-                        width: 5,
+                        width: 50,
                         arcType: Cesium.ArcType.RHUMB,
                         // clampToGround: true,
-                        material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.RED)
+                        // material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.RED)
                         // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                        material: new Cesium.PolylineTrailLinkMaterialProperty(Cesium.Color.RED, "./static/arrow.png", 1500)
+
                       }
                     })
                 )
@@ -346,7 +428,7 @@ export default {
                   //获取相机射线
                   let ray = viewer.scene.camera.getPickRay(move.endPosition);
                   //根据射线和场景求出在球面中的笛卡尔坐标
-                  let movepick = viewer.scene.globe.pick(ray,viewer.scene);
+                  let movepick = viewer.scene.globe.pick(ray, viewer.scene);
                   //获取该浏览器坐标的顶部数据
                   let feature = viewer.scene.pick(move.endPosition);
                   // console.log(feature);
@@ -357,9 +439,8 @@ export default {
                     let mlat = Cesium.Math.toDegrees(cartesian.latitude);
                     let mMouseHeight = Cesium.Math.toDegrees(cartesian.height);
                     linkPosition = [...[linkPosition[0], linkPosition[1], linkPosition[2]], ...[mlon, mlat, mMouseHeight]];
-                  }
-                  else{
-                    if (Cesium.defined(cartesian) ){
+                  } else {
+                    if (Cesium.defined(cartesian)) {
                       //如果对象已定义，将度转为经纬度
                       let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
                       let mlon = Cesium.Math.toDegrees(cartographic.longitude);
@@ -402,6 +483,45 @@ export default {
           }
         })
       }
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    changeFile(file) {
+      const datas = this.importDatas;
+      let entities = [];
+      datas.forEach(data => {
+        let position = Cesium.Cartesian3.fromDegrees(data.lon, data.lat, data.height)
+        entities.push(viewer.entities.add({
+          id: data.id,
+          name: data.name,
+          position: position,
+          orientation: Cesium.Transforms.headingPitchRollQuaternion(position, new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(data.angle - 90), Cesium.Math.toRadians(0),
+              Cesium.Math.toRadians(0))),
+          // Attach the 3D model instead of the green point.
+          label: {
+            // This callback updates the length to print each frame.
+            text: data.name,
+            font: "14px sans-serif",
+            fillColor: Cesium.Color.fromCssColorString("#ff0"),
+            outlineColor: Cesium.Color.RED,
+            outlineWidth: 1,
+            eyeOffset: new Cesium.Cartesian3(0, 200, 100),
+            scaleByDistance: new Cesium.NearFarScalar(15000, 1.2, 5000, 1),
+          },
+          model: {
+            uri: "./model/" + data.type + ".glb",
+            scale: data.scale,
+          },
+        }))
+      })
+      viewer.flyTo(entities)
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
     }
   }
 }
@@ -448,6 +568,12 @@ export default {
     .demo-menu_item {
       margin: 10px;
     }
+  }
+
+  .demo-update_panel {
+    width: 250px;
+    text-align: center;
+    margin-left: 55px;
   }
 }
 </style>
