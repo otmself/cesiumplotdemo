@@ -13,23 +13,10 @@ module.exports = defineConfig({
     },
     configureWebpack: {
         plugins: [new NodePolyfillPlugin(), new CopyWebpackPlugin({
-
-        })]
-    },
-    chainWebpack(config) {
-        // set preserveWhitespace
-
-        config.resolve.alias
-            .set('@', resolve('src'))
-            .set('assets', resolve('src/assets'))
-            .set('utils', resolve('src/utils'));
-
-        config.plugin("copy").use(require("copy-webpack-plugin"), [{
             patterns: [
-                {from: './static', to: "static"}
+                {from: './src/static', to: "./public/static"}
             ]
-        }]);
-
+        })]
     },
 })
 

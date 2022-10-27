@@ -414,12 +414,12 @@ export default {
                     new Cesium.Entity({
                       polyline: {
                         positions: dynamicPositions,
-                        width: 50,
+                        width: 10,
                         arcType: Cesium.ArcType.RHUMB,
                         // clampToGround: true,
                         // material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.RED)
                         // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-                        material: new Cesium.PolylineTrailLinkMaterialProperty(Cesium.Color.RED, "./static/arrow.png", 1500)
+                        material: new Cesium.PolylineTrailLinkMaterialProperty(Cesium.Color.RED, "./static/rockets_h.svg", 5000)
 
                       }
                     })
