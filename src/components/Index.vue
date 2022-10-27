@@ -414,12 +414,12 @@ export default {
                     new Cesium.Entity({
                       polyline: {
                         positions: dynamicPositions,
-                        width: 50,
+                        width: 12,
                         arcType: Cesium.ArcType.RHUMB,
                         // clampToGround: true,
                         // material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.RED)
                         // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-                        material: new Cesium.PolylineTrailLinkMaterialProperty(Cesium.Color.RED, "./static/arrow.png", 1500)
+                        material: new Cesium.PolylineTrailLinkMaterialProperty(Cesium.Color.RED, "./static/rockets.svg", 5000)
 
                       }
                     })
@@ -446,7 +446,6 @@ export default {
                       let mlon = Cesium.Math.toDegrees(cartographic.longitude);
                       let mlat = Cesium.Math.toDegrees(cartographic.latitude);
                       let mMouseHeight = cartographic.height;//模型高度
-
                       linkPosition = [...[linkPosition[0], linkPosition[1], linkPosition[2]], ...[mlon, mlat, mMouseHeight]];
                     }
                   }
