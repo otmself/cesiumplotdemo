@@ -137,6 +137,10 @@ export default {
           name: "地空目标",
           fun: "GroundLinkSky",
           custom: true
+        }, {
+          name: "清空内容",
+          fun: "clearAll",
+          custom: true
         }],
       fileList: [],
       selIndex: null,
@@ -474,6 +478,12 @@ export default {
               }
             }
           }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+          self.selFun = null;
+        }
+        if (fun.fun == "clearAll") {
+          viewer.dataSources.get(0).entities.removeAll();
+          viewer.entities.removeAll();
+          self.selFun = null;
         }
       } else {
         plot.plotDraw.active(fun.fun, {}, function (data) {
