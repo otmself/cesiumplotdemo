@@ -366,6 +366,16 @@ export default {
         if (fun.fun == 'GroundLinkSky') {
           const airplaneEntity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(80, 35.1, 5000),
+            label: {
+              // This callback updates the length to print each frame.
+              text: "战机",
+              font: "14px sans-serif",
+              fillColor: Cesium.Color.fromCssColorString("#ff0"),
+              outlineColor: Cesium.Color.RED,
+              outlineWidth: 1,
+              eyeOffset: new Cesium.Cartesian3(0, 400, 100),
+              scaleByDistance: new Cesium.NearFarScalar(15000, 1.2, 5000, 1),
+            },
             // Attach the 3D model instead of the green point.
             model: {
               uri: "./model/Fighter.glb",
@@ -373,7 +383,16 @@ export default {
             },
           });
           const tigerEntity = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(80, 35, 0),
+            position: Cesium.Cartesian3.fromDegrees(80, 35, 0),label: {
+              // This callback updates the length to print each frame.
+              text: "坦克",
+              font: "14px sans-serif",
+              fillColor: Cesium.Color.fromCssColorString("#ff0"),
+              outlineColor: Cesium.Color.RED,
+              outlineWidth: 1,
+              eyeOffset: new Cesium.Cartesian3(0, 200, 100),
+              scaleByDistance: new Cesium.NearFarScalar(15000, 1.2, 5000, 1),
+            },
             // Attach the 3D model instead of the green point.
             model: {
               uri: "./model/Tiger.glb",
