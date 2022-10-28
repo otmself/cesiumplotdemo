@@ -14,7 +14,10 @@ module.exports = defineConfig({
     configureWebpack: {
         plugins: [new NodePolyfillPlugin(), new CopyWebpackPlugin({
             patterns: [
-                {from: './src/static', to: "./public/static"}
+                {
+                    from: path.resolve(__dirname, './src/static'),
+                    to: "./static"
+                }
             ]
         })]
     },
