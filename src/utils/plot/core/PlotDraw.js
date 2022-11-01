@@ -8,7 +8,7 @@ import { BASE_LAYERNAME } from "../Constants";
 import { createDataSource } from "../utils/DataSourceUtil";
 // eslint-disable-next-line no-unused-vars
 import { getuuid, MathDistance, bindAll } from "../utils/Utils";
-import * as Plots from "../geometry/index";
+import * as Plots from "../geometry";
 import * as PlotTypes from "../utils/PlotTypes";
 
 class PlotDraw {
