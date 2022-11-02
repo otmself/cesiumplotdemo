@@ -30,13 +30,14 @@ export default {
     // const Cesium = this.Cesium
     const viewer = new Cesium.Viewer("cesiumContainer", {
       geocoder: false,
-      // baseLayerPicker: false,
       selectionIndicator: false,
       baseLayerPicker: false,
       animation: true,
       navigationHelpButton: false,
       infoBox: false,
       timeline: true,
+      homeButton:false,
+      sceneModePicker:false,
 
       fullscreenButton: false,
       // sceneMode: Cesium.SceneMode.SCENE2D,

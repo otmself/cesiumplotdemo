@@ -1,14 +1,14 @@
 <template>
   <div class="demo-left_menu">
-    <div class="demo-nav_panel">
-      <el-button size="medium" class="demo-nav_item" v-for="(nav, key) in navs" :key="key" @click="openMenu(key)"
-                 :type="selIndex === key ? 'primary' : ''">{{ nav }}
-      </el-button>
-    </div>
+    <el-button size="small" class="demo-nav_item" v-for="(nav, key) in navs" :key="key" @click="openMenu(key)"
+               :type="selIndex === key ? 'primary' : ''">{{ nav }}
+    </el-button>
     <transition name="el-zoom-in-top">
       <div class="demo-menu_panel" v-show="selIndex == 0">
-        <el-button v-for="plot in plots" :key="plot.fun" size="small" @click="drawPlot(plot)"
-                   :type="selFun == plot.fun ? 'primary' : ''" class="demo-menu_item">{{ plot.name }}
+        <i class="el-icon-close"></i>
+        <el-button v-for="plot in plots" :key="plot.fun" size="mini" @click="drawPlot(plot)"
+                   :type="selFun == plot.fun ? 'primary' : ''" class="demo-menu_item" circle>
+          <div v-bind:style="{backgroundImage: 'url(' + plot.url + ')'}" class="demo-menu_plot" :title="plot.name"></div>
         </el-button>
       </div>
     </transition>
@@ -38,7 +38,8 @@ export default {
   name: "LeftMenu",
   data() {
     return {
-      navs: ["沙盘", "导入", "实时轨迹"],
+      navs: ["标绘", "态势导入", "行动推演"],
+
       plots: [
         {
           name: "点",
@@ -480,40 +481,41 @@ export default {
   top: 0;
   z-index: 1;
   width: 50px;
-  background: white;
+  text-align: center;
+  padding-top: 10px;
 
-  .demo-nav_panel {
-    position: absolute;
-    left: 0;
-    width: 360px;
-    z-index: 1;
-    text-align: center;
-
-    .demo-nav_item {
-      margin: 20px 2px;
-      width: 80px;
-    }
+  .demo-nav_item {
+    margin: 8px 2px;
+    width: 80px;
   }
 
   .demo-menu_panel {
     position: absolute;
-    left: 0;
+    left: 90px;
     z-index: 1;
     background: white;
     padding: 20px;
     border-radius: 5px;
-    top: 60px;
+    top: 20px;
     width: 360px;
+
+    .el-icon-close {
+      font-size: 16px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
 
     .demo-menu_item {
       margin: 10px;
+      .demo-menu_plot{
+        height: 16px;
+        width: 16px;
+        background-repeat: no-repeat;
+      }
     }
   }
 
-  .demo-update_panel {
-    width: 250px;
-    text-align: center;
-    margin-left: 55px;
-  }
 }
 </style>

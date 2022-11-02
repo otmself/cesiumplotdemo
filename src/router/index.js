@@ -1,11 +1,13 @@
-import {createRouter, createWebHistory} from "vue-router";
+import VueRouter from "vue-router"
+import Vue from 'vue'
+Vue.use(VueRouter)
 import Index from '../components/Index.vue';
 
-const router = createRouter({
-    history: createWebHistory(),
+const router = new VueRouter({
     routes: [
         {
             path: '/',
+            name: "index",
             component: Index,
         }
     ]
