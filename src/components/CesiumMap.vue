@@ -76,6 +76,7 @@ export default {
         }
       }
     }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
     this.$emit("ready", viewer)
   }
 }

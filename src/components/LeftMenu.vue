@@ -5,26 +5,28 @@
     </el-button>
     <transition name="el-zoom-in-top">
       <div class="demo-menu_panel" v-show="selIndex == 0">
-        <i class="el-icon-close"></i>
-        <el-button v-for="plot in plots" :key="plot.fun" size="mini" @click="drawPlot(plot)"
-                   :type="selFun == plot.fun ? 'primary' : ''" class="demo-menu_item" circle>
-          <div v-bind:style="{backgroundImage: 'url(' + plot.url + ')'}" class="demo-menu_plot" :title="plot.name"></div>
-        </el-button>
+        <i class="el-icon-close" @click="closeMenu"></i>
+        <el-tooltip v-for="plot in plots" :key="plot.fun" :content="plot.name" placement="top" effect="light">
+          <el-button size="mini" @click="drawPlot(plot)"
+                     :type="selFun == plot.fun ? 'primary' : 'info'" class="demo-menu_item" circle>
+            <div v-bind:style="{backgroundImage: 'url(' + plot.url + ')'}" class="demo-menu_plot"></div>
+          </el-button>
+        </el-tooltip>
       </div>
     </transition>
     <transition name="el-zoom-in-top">
       <div class="demo-menu_panel demo-update_panel" v-show="selIndex == 1">
-        <el-upload
-            class="upload-demo"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :before-remove="beforeRemove"
-            :on-change="changeFile"
-            :file-list="fileList"
-            :show-file-list="false"
-            :auto-upload="false">
-          <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-        </el-upload>
+<!--        <el-upload-->
+<!--            class="upload-demo"-->
+<!--            :on-preview="handlePreview"-->
+<!--            :on-remove="handleRemove"-->
+<!--            :before-remove="beforeRemove"-->
+<!--            :on-change="changeFile"-->
+<!--            :file-list="fileList"-->
+<!--            :show-file-list="false"-->
+<!--            :auto-upload="false">-->
+<!--          <el-button slot="trigger" size="small" type="primary">选取文件</el-button>-->
+<!--        </el-upload>-->
       </div>
     </transition>
   </div>
@@ -43,91 +45,119 @@ export default {
       plots: [
         {
           name: "点",
-          fun: "Point"
+          fun: "Point",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "线",
-          fun: "Polyline"
+          fun: "Polyline",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "曲线",
-          fun: "Curve"
+          fun: "Curve",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "弓形线",
-          fun: "Arc"
+          fun: "Arc",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "圆",
-          fun: "Circle"
+          fun: "Circle",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "自由线",
-          fun: "FreeHandLine"
+          fun: "FreeHandLine",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "矩形",
-          fun: "RectAngle"
+          fun: "RectAngle",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "椭圆",
-          fun: "Ellipse"
+          fun: "Ellipse",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "弓型面",
-          fun: "Lune"
+          fun: "Lune",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "扇形",
-          fun: "Sector"
+          fun: "Sector",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "闭合曲面",
-          fun: "ClosedCurve"
+          fun: "ClosedCurve",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "多边形",
-          fun: "Polygon"
+          fun: "Polygon",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "自由面",
-          fun: "FreePolygon"
+          fun: "FreePolygon",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "集结地",
-          fun: "GatheringPlace"
+          fun: "GatheringPlace",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "钳击",
-          fun: "DoubleArrow"
+          fun: "DoubleArrow",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "细直箭头",
-          fun: "StraightArrow"
+          fun: "StraightArrow",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "粗单尖头箭头",
-          fun: "FineArrow"
+          fun: "FineArrow",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "进攻方向",
-          fun: "AttackArrow"
+          fun: "AttackArrow",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "粗单直箭头",
-          fun: "AssaultDirection"
+          fun: "AssaultDirection",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "进攻方向(尾)",
-          fun: "TailedAttackArrow"
+          fun: "TailedAttackArrow",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "分队战斗行动",
-          fun: "SquadCombat"
+          fun: "SquadCombat",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "分队战斗行动(尾)",
-          fun: "TailedSquadCombat"
+          fun: "TailedSquadCombat",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "矩形标志旗",
-          fun: "RectFlag"
+          fun: "RectFlag",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "三角标志旗",
-          fun: "TriangleFlag"
+          fun: "TriangleFlag",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "曲线标志旗",
-          fun: "CurveFlag"
+          fun: "CurveFlag",
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "飞行轨迹",
           fun: "fly",
-          custom: true
+          custom: true,
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "地空目标",
           fun: "GroundLinkSky",
-          custom: true
+          custom: true,
+          url: require('../assets/icon/arrow.svg')
         }, {
           name: "清空内容",
           fun: "clearAll",
-          custom: true
+          custom: true,
+          url: require('../assets/icon/arrow.svg')
         }],
       fileList: [],
       selIndex: null,
@@ -200,6 +230,9 @@ export default {
   methods: {
     openMenu(index) {
       this.selIndex = index
+    },
+    closeMenu(){
+      this.selIndex = null
     },
     drawPlot(fun) {
       this.selFun = fun.fun;
@@ -493,11 +526,12 @@ export default {
     position: absolute;
     left: 90px;
     z-index: 1;
-    background: white;
+    background: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 5px;
     top: 20px;
     width: 360px;
+    text-align: left;
 
     .el-icon-close {
       font-size: 16px;
@@ -509,10 +543,12 @@ export default {
 
     .demo-menu_item {
       margin: 10px;
-      .demo-menu_plot{
+
+      .demo-menu_plot {
         height: 16px;
         width: 16px;
         background-repeat: no-repeat;
+        background-size: cover;
       }
     }
   }
