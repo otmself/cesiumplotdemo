@@ -3,8 +3,8 @@
     <div class="demo-title_panel">
       <span>标绘功能演示</span>
     </div>
-    <left-menu></left-menu>
-    <right-menu></right-menu>
+    <left-menu ref="leftMenu"></left-menu>
+    <right-menu ref="rightMenu"></right-menu>
     <cesium-map @ready="mapCreated"></cesium-map>
   </div>
 </template>
@@ -42,7 +42,9 @@ export default {
   },
   methods: {
     mapCreated(e) {
-      viewer = e
+      viewer = e;
+      this.$refs.leftMenu.viewer = e;
+      this.$refs.rightMenu.viewer = e;
     }
   }
 }

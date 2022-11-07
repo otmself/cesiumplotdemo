@@ -41,7 +41,7 @@ export default {
   data() {
     return {
       navs: ["标绘", "态势导入", "行动推演"],
-
+      viewer:null,
       plots: [
         {
           name: "点",
@@ -545,6 +545,7 @@ export default {
       margin: 10px;
 
       .demo-menu_plot {
+        cursor: pointer;
         height: 16px;
         width: 16px;
         background-repeat: no-repeat;

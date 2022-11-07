@@ -1,14 +1,17 @@
 <template>
   <div class="demo-right_menu">
     <el-dropdown size="small">
-      <el-button circle size="small">
-        <div class="demo-right_layerManager"></div>
-      </el-button>
+      <el-tooltip content="视图切换" placement="left">
+        <el-button circle size="small">
+          <div class="demo-right_layerManager"
+               v-bind:style="{backgroundImage: 'url(' + views[viewIndex].url + ')'}"></div>
+        </el-button>
+      </el-tooltip>
       <el-dropdown-menu slot="dropdown" :hide-on-click="false">
         <el-dropdown-item v-for="(view, index) in views" :key="index">
           <el-tooltip :content="view.name" placement="left">
-            <el-button circle size="small" :type="viewsType == view.type ? 'primary' : ''"
-                       @click="switchView(view.type)">
+            <el-button circle size="small" :type="viewIndex == index ? 'primary' : ''"
+                       @click="switchView(index)">
               <div class="demo-right_layerItem" :style="{backgroundImage: 'url(' + view.url + ')'}"></div>
             </el-button>
           </el-tooltip>
@@ -23,6 +26,7 @@ export default {
   name: "RightMenu",
   data() {
     return {
+      viewer: null,
       views: [{
         name: "三维视图",
         type: "3d",
@@ -36,12 +40,22 @@ export default {
         type: "logic",
         url: require('../assets/icon/logic.svg')
       }],
-      viewsType: "3d",
+      viewIndex: 0,
     }
   },
   methods: {
-    switchView(type) {
-      this.viewsType = type
+    switchView(index) {
+      this.viewIndex = index;
+      index == 0 ? this.viewer.scene.morphTo3D(1) : this.viewer.scene.morphTo2D(1);
+    },
+  },
+  watch: {
+    viewer() {
+      if (this.viewIndex == 0) {
+        this.viewer.scene.morphTo3D(0);
+      } else {
+        this.viewer.scene.morphTo2D(0);
+      }
     }
   }
 }
@@ -60,9 +74,11 @@ export default {
   text-align: center;
 
   .demo-right_layerManager {
+    cursor: pointer;
     height: 24px;
     width: 24px;
-    background: url("../assets/icon/layermanager.svg") no-repeat;
+    background: url("../assets/icon/layermanager.svg");
+    background-repeat: no-repeat;
     background-size: cover;
   }
 }
@@ -84,6 +100,7 @@ export default {
       }
 
       .demo-right_layerItem {
+        cursor: pointer;
         height: 24px;
         width: 24px;
         background-repeat: no-repeat;
