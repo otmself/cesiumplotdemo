@@ -19,20 +19,24 @@
       </el-dropdown-menu>
     </el-dropdown>
     <el-tooltip content="视角切换" placement="left">
-      <el-button circle size="small" class="demo-right_menuBtn">
+      <el-button circle size="small" class="demo-right_menuBtn" @click="perspectiveShow = !perspectiveShow"
+                 :type="perspectiveShow ? 'primary' : ''">
         <div class="demo-right_menuItem"
              v-bind:style="{backgroundImage: 'url(' + require('../assets/icon/perspective.svg') + ')'}"></div>
       </el-button>
     </el-tooltip>
     <transition name="el-zoom-in-top">
-      <div class="demo-perspective_panel">
-        <i class="el-icon-close"></i>
+      <div class="demo-perspective_panel" v-show="perspectiveShow">
+        <i class="el-icon-close" @click="closePerspective"></i>
+        <el-button @click="sky">太空视角</el-button>
       </div>
     </transition>
   </div>
 </template>
 
 <script>
+import * as Cesium from "../../public/Cesium/Cesium";
+
 export default {
   name: "RightMenu",
   data() {
@@ -52,6 +56,7 @@ export default {
         url: require('../assets/icon/logic.svg')
       }],
       viewIndex: 0,
+      perspectiveShow: false
     }
   },
   methods: {
@@ -59,6 +64,20 @@ export default {
       this.viewIndex = index;
       index == 0 ? this.viewer.scene.morphTo3D(0) : this.viewer.scene.morphTo2D(0);
     },
+    closePerspective() {
+      this.perspectiveShow = false;
+    },
+    sky(){
+      this.viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(28,56, 200000000),
+        orientation: {
+          heading: 7,
+          pitch: 5,
+          roll: 5
+        },
+        duration: 2
+      })
+    }
   },
   watch: {
     viewer() {
@@ -84,6 +103,11 @@ export default {
   padding: 20px 0;
   text-align: center;
 
+  button:hover {
+    color: #FFF;
+    background-color: #409EFF;
+    border-color: #409EFF;
+  }
 
   .demo-right_menuItem {
     cursor: pointer;

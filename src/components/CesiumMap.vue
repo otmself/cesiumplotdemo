@@ -3,7 +3,7 @@
     <div class="demo-map_location">
       <div class="demo-map_locationItem" v-for="(item, index) in locations" :key="index">
         <span>{{item}}</span>
-        <span>:{{moveLocation[index]}}</span>
+        <span>：{{moveLocation[index]}}</span>
       </div>
     </div>
   </div>
@@ -24,17 +24,17 @@ export default {
   },
   methods: {},
   mounted() {
-    Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(
-        //-70, // 东
-        //0.0, // 南
-        //0, // 西
-        //90.0, // 北
-        //更改为中国区域的初始视角
-        80,
-        35,
-        81,
-        36
-    );
+    // Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(
+    //     //-70, // 东
+    //     //0.0, // 南
+    //     //0, // 西
+    //     //90.0, // 北
+    //     //更改为中国区域的初始视角
+    //     80,
+    //     35,
+    //     81,
+    //     36
+    // );
     Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.2;
     // const Cesium = this.Cesium
     const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -104,8 +104,8 @@ export default {
         self.moveLocation = [null, null, height];
       }
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
-
     this.$emit("ready", viewer)
+    viewer.dataSources.add(Cesium.CzmlDataSource.load("./data/czml/meo.czml"))
   }
 }
 </script>
