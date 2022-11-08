@@ -13,9 +13,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 // app.use(router)
 // app.use(ElementPlus)
 // app.use(ElementUI)
-// app.use(vueCesium, {
-//     cesiumPath: './Cesium/Cesium.js'
-// })
+
 Vue.use(ElementUI)
 // Vue.use(router)
 new Vue({

@@ -1,9 +1,9 @@
 <template>
   <div class="demo-right_menu">
-    <el-dropdown size="small">
+    <el-dropdown size="small" trigger="click">
       <el-tooltip content="视图切换" placement="left">
         <el-button circle size="small">
-          <div class="demo-right_layerManager"
+          <div class="demo-right_menuItem"
                v-bind:style="{backgroundImage: 'url(' + views[viewIndex].url + ')'}"></div>
         </el-button>
       </el-tooltip>
@@ -18,6 +18,17 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
+    <el-tooltip content="视角切换" placement="left">
+      <el-button circle size="small" class="demo-right_menuBtn">
+        <div class="demo-right_menuItem"
+             v-bind:style="{backgroundImage: 'url(' + require('../assets/icon/perspective.svg') + ')'}"></div>
+      </el-button>
+    </el-tooltip>
+    <transition name="el-zoom-in-top">
+      <div class="demo-perspective_panel">
+        <i class="el-icon-close"></i>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -46,7 +57,7 @@ export default {
   methods: {
     switchView(index) {
       this.viewIndex = index;
-      index == 0 ? this.viewer.scene.morphTo3D(1) : this.viewer.scene.morphTo2D(1);
+      index == 0 ? this.viewer.scene.morphTo3D(0) : this.viewer.scene.morphTo2D(0);
     },
   },
   watch: {
@@ -70,17 +81,42 @@ export default {
   bottom: 27px;
   width: 56px;
   background: rgba(255, 255, 255, 0);
-  padding: 5px 0;
+  padding: 20px 0;
   text-align: center;
 
-  .demo-right_layerManager {
+
+  .demo-right_menuItem {
     cursor: pointer;
     height: 24px;
     width: 24px;
-    background: url("../assets/icon/layermanager.svg");
     background-repeat: no-repeat;
     background-size: cover;
   }
+
+  .demo-right_menuBtn {
+    margin-top: 7px;
+  }
+
+  .demo-perspective_panel {
+    position: absolute;
+    right: 60px;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 5px;
+    top: 20px;
+    width: 360px;
+
+
+    .el-icon-close {
+      font-size: 16px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+  }
+
 }
 
 .el-dropdown-menu {
@@ -112,4 +148,11 @@ export default {
   }
 }
 
+.el-popper[x-placement^=bottom] {
+  margin-top: 6px;
+}
+
+.el-dropdown-menu--small {
+  padding: 0;
+}
 </style>
