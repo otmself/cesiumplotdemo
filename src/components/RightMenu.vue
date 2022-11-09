@@ -1,7 +1,7 @@
 <template>
   <div class="demo-right_menu">
     <el-dropdown size="small" trigger="click">
-      <el-tooltip content="视图切换" placement="left">
+      <el-tooltip content="视图切换" placement="bottom">
         <el-button circle size="small" @click="perspectiveShow = false; layerManagerShow=false;">
           <div class="demo-right_menuItem"
                v-bind:style="{backgroundImage: 'url(' + views[viewIndex].url + ')'}"></div>
@@ -18,14 +18,14 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <el-tooltip content="视角切换" placement="left" v-show="viewIndex == 0">
+    <el-tooltip content="视角切换" placement="bottom" v-show="viewIndex == 0">
       <el-button circle size="small" class="demo-right_menuBtn" @click="perspectiveShow = !perspectiveShow; layerManagerShow=false;"
                  :type="perspectiveShow ? 'primary' : ''">
         <div class="demo-right_menuItem"
              v-bind:style="{backgroundImage: 'url(' + require('../assets/icon/perspective.svg') + ')'}"></div>
       </el-button>
     </el-tooltip>
-    <el-tooltip content="图层管理" placement="left">
+    <el-tooltip content="图层管理" placement="bottom">
       <el-button circle size="small" class="demo-right_menuBtn" @click="layerManagerShow = !layerManagerShow; perspectiveShow=false;"
                  :type="layerManagerShow ? 'primary' : ''">
         <div class="demo-right_menuItem"
@@ -66,7 +66,9 @@
               </el-form>
             </div>
           </div>
-          <div v-show="layerManagerShow"></div>
+          <div v-show="layerManagerShow">
+
+          </div>
         </div>
     </transition>
   </div>
