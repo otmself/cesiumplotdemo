@@ -8,6 +8,10 @@
         <span>{{ item }}</span>
         <span>：{{ moveLocation[index] }}</span>
       </div>
+      <div class="demo-map_locationItem" v-for="(item, index) in locations" :key="index">
+        <span>{{ item }}</span>
+        <span>：{{ moveLocation1[index] }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -24,11 +28,45 @@ export default {
       locations: ["经度", "纬度", "高度"],
       moveLocation: [null, null, null],
       mapMenuShow: false,
+      moveLocation1: [null, null, null],
     }
   },
-  methods: {},
+  methods: {
+    onMouseMove(event) {
+      const {Cartesian2} = Cesium
+
+      const clientX = event.type === 'mousemove' ? event.clientX : event.changedTouches[0].clientX
+      const clientY = event.type === 'mousemove' ? event.clientY : event.changedTouches[0].clientY
+      if (clientX === this.lastMouseX && clientY === this.lastMouseY) {
+        return
+      }
+
+      this.lastMouseX = clientX
+      this.lastMouseY = clientY
+
+      if (this.viewer) {
+        const rect = this.viewer._element.getBoundingClientRect()
+        const position = new Cartesian2(clientX - rect.left, clientY - rect.top)
+        let ellipsoid = this.viewer.scene.globe.ellipsoid;
+        let cartesian = this.viewer.camera.pickEllipsoid(position, ellipsoid);
+        if (cartesian) {
+          let height = this.viewer.camera.positionCartographic.height.toFixed(2);
+          //将笛卡尔坐标转换为地理坐标
+          let cartographic = ellipsoid.cartesianToCartographic(cartesian);
+          //将弧度转为度的十进制度表示
+          let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+          let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+          this.moveLocation1 = [longitude.toFixed(5), latitude.toFixed(5), height]
+        }
+
+        // this.mouseCoords.updateCoordinatesFromCesium(this.viewer, position)
+      }
+    }
+  },
   mounted() {
     Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.2;
+    this.lastMouseX = -1
+    this.lastMouseY = -1
     // const Cesium = this.Cesium
     const viewer = new Cesium.Viewer("cesiumContainer", {
       geocoder: false,
@@ -80,6 +118,7 @@ export default {
         }
       }
     }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    //实时获取坐标
     handler.setInputAction(function (movement) {
       let ellipsoid = viewer.scene.globe.ellipsoid;
       let cartesian = viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
@@ -96,6 +135,7 @@ export default {
         self.moveLocation = [null, null, height];
       }
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+    this.viewer = viewer
     this.$emit("ready", viewer)
     this.$refs.map.oncontextmenu = function (e) {
       e.preventDefault();
@@ -104,6 +144,7 @@ export default {
         self.mapMenuShow = true;
       }
     }
+    viewer._element.addEventListener('mousemove', this.onMouseMove, false)
     viewer.dataSources.add(Cesium.CzmlDataSource.load("./data/czml/meo.czml"))
   }
 }
