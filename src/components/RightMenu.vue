@@ -2,7 +2,7 @@
   <div class="demo-right_menu">
     <el-dropdown size="small" trigger="click">
       <el-tooltip content="视图切换" placement="left">
-        <el-button circle size="small">
+        <el-button circle size="small" @click="perspectiveShow = false; layerManagerShow=false;">
           <div class="demo-right_menuItem"
                v-bind:style="{backgroundImage: 'url(' + views[viewIndex].url + ')'}"></div>
         </el-button>
@@ -18,30 +18,116 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <el-tooltip content="视角切换" placement="left">
-      <el-button circle size="small" class="demo-right_menuBtn" @click="perspectiveShow = !perspectiveShow"
+    <el-tooltip content="视角切换" placement="left" v-show="viewIndex == 0">
+      <el-button circle size="small" class="demo-right_menuBtn" @click="perspectiveShow = !perspectiveShow; layerManagerShow=false;"
                  :type="perspectiveShow ? 'primary' : ''">
         <div class="demo-right_menuItem"
              v-bind:style="{backgroundImage: 'url(' + require('../assets/icon/perspective.svg') + ')'}"></div>
       </el-button>
     </el-tooltip>
-    <transition name="el-zoom-in-top">
-      <div class="demo-perspective_panel" v-show="perspectiveShow">
-        <i class="el-icon-close" @click="closePerspective"></i>
-        <el-button @click="sky">太空视角</el-button>
-      </div>
+    <el-tooltip content="图层管理" placement="left">
+      <el-button circle size="small" class="demo-right_menuBtn" @click="layerManagerShow = !layerManagerShow; perspectiveShow=false;"
+                 :type="layerManagerShow ? 'primary' : ''">
+        <div class="demo-right_menuItem"
+             v-bind:style="{backgroundImage: 'url(' + require('../assets/icon/layermanager.svg') + ')'}"></div>
+      </el-button>
+    </el-tooltip>
+    <transition name="el-zoom-in-top" size="mini">
+        <div class="demo-perspective_panel" v-show="perspectiveShow || layerManagerShow">
+          <i class="el-icon-close" @click="closePanle"></i>
+          <div v-show="perspectiveShow">
+            <el-radio-group v-model="selPerspective" size="mini" @change="changePerspective">
+              <el-radio-button v-for="(perspective, index) in perspectives" :label="perspective"></el-radio-button>
+            </el-radio-group>
+            <div class="demo-perspective_inputPanle" v-show="selPerspective != '太空' && selPerspective">
+              <el-form :model="perspectiveForm" status-icon :rules="rules" label-width="40px" size="mini" ref="perform">
+                <el-form-item label="经度" prop="inputLon">
+                  <el-input v-model="perspectiveForm.inputLon" placeholder="请输入经度" class="demo-perspective_input">
+                    <template slot="append">°</template>
+                  </el-input>
+                </el-form-item>
+
+                <el-form-item label="纬度" prop="inputLat">
+
+                  <el-input v-model="perspectiveForm.inputLat" placeholder="请输入纬度" class="demo-perspective_input">
+                    <template slot="append">°</template>
+                  </el-input>
+
+                </el-form-item>
+
+                <el-form-item label="高度" prop="inputHeight" v-if="selPerspective == '参照物'">
+                  <el-input v-model="perspectiveForm.inputHeight" size="mini" placeholder="请输入高度"
+                            class="demo-perspective_input">
+                    <template slot="append">m</template>
+                  </el-input>
+                </el-form-item>
+
+                <el-button size="mini" @click="changePerspective" style="margin-top: 5px">确认</el-button>
+              </el-form>
+            </div>
+          </div>
+          <div v-show="layerManagerShow"></div>
+        </div>
     </transition>
   </div>
 </template>
 
 <script>
 import * as Cesium from "../../public/Cesium/Cesium";
+import {isObject} from "@/utils/plot/utils/Utils";
 
 export default {
   name: "RightMenu",
   data() {
+    //field
+    let checkLon = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请输入经度'));
+      }
+      value = Number(value);
+      if (isNaN(value)) {
+        callback(new Error('请输入正确的经度格式'));
+      } else {
+        if (value > 180 || value < -180) {
+          callback(new Error('请输入正确的经度范围'));
+        } else {
+          callback();
+        }
+      }
+    };
+    let checkLat = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请输入纬度'));
+      }
+      value = Number(value);
+      if (isNaN(value)) {
+        callback(new Error('请输入正确的纬度格式'));
+      } else {
+        if (value > 90 || value < -90) {
+          callback(new Error('请输入正确的纬度范围'));
+        } else {
+          callback();
+        }
+      }
+    };
+    let checkHeight = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请输入高度'));
+      }
+      value = Number(value);
+      if (isNaN(value)) {
+        callback(new Error('请输入正确的高度格式'));
+      } else {
+        if (value < 0) {
+          callback(new Error('请输入正确的高度范围'));
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       viewer: null,
+      layerManagerShow: false,
       views: [{
         name: "三维视图",
         type: "3d",
@@ -56,27 +142,97 @@ export default {
         url: require('../assets/icon/logic.svg')
       }],
       viewIndex: 0,
-      perspectiveShow: false
+      perspectiveShow: false,
+      selPerspective: null,
+      perspectives: ["地面", "参照物", "太空"],
+      perspectiveForm: {
+        inputLon: null,
+        inputLat: null,
+        inputHeight: null,
+      },
+      rules: {
+        inputLon: [
+          {validator: checkLon, trigger: 'blur'}
+        ],
+        inputLat: [
+          {validator: checkLat, trigger: 'blur'}
+        ],
+        inputHeight: [
+          {validator: checkHeight, trigger: 'blur'}
+        ]
+      }
     }
   },
   methods: {
     switchView(index) {
       this.viewIndex = index;
-      index == 0 ? this.viewer.scene.morphTo3D(0) : this.viewer.scene.morphTo2D(0);
+      if (index == 0) {
+        this.viewer.scene.morphTo3D(0)
+      } else {
+        this.perspectiveShow = false;
+        this.viewer.scene.screenSpaceCameraController.enableTranslate = true
+        this.viewer.scene.screenSpaceCameraController.enableZoom = true
+        this.viewer.scene.morphTo2D(0);
+      }
     },
-    closePerspective() {
+    closePanle() {
       this.perspectiveShow = false;
+      this.layerManagerShow = false;
     },
-    sky(){
-      this.viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(28,56, 200000000),
-        orientation: {
-          heading: 7,
-          pitch: 5,
-          roll: 5
-        },
-        duration: 2
-      })
+    changePerspective(e) {
+      let option = null;
+      if (isObject(e)) {
+        this.$refs.perform.validate((valid) => {
+          if (valid) {
+            option = true;
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (!option)
+          return;
+        if (this.selPerspective == '参照物') {
+          option = {
+            destination: Cesium.Cartesian3.fromDegrees(Number(this.perspectiveForm.inputLon), Number(this.perspectiveForm.inputLat), Number(this.perspectiveForm.inputHeight)),
+            orientation: {
+              heading: 0.34,
+              pitch: -0.3,
+              roll: 0
+            },
+            duration: 2
+          }
+        }
+        if (this.selPerspective == '地面') {
+          option = {
+            destination: Cesium.Cartesian3.fromDegrees(Number(this.perspectiveForm.inputLon), Number(this.perspectiveForm.inputLat), 1),
+            orientation: {
+              heading: 0.34,
+              pitch: 0,
+              roll: 0
+            },
+            duration: 2
+          }
+        }
+      }
+      if (e == '太空') {
+        option = {
+          destination: Cesium.Cartesian3.fromDegrees(28, 56, 200000000),
+          orientation: {
+            heading: 7,
+            pitch: 5,
+            roll: 5
+          },
+          duration: 2
+        }
+      }
+      if (option) {
+        // this.viewer.scene.screenSpaceCameraController.enableTranslate = false
+        //
+        // this.viewer.scene.screenSpaceCameraController.enableTilt = false;
+        this.viewer.scene.screenSpaceCameraController.enableZoom = false
+        this.viewer.camera.flyTo(option)
+      }
     }
   },
   watch: {
@@ -97,11 +253,9 @@ export default {
   right: 0;
   top: 0;
   z-index: 1;
-  bottom: 27px;
-  width: 56px;
   background: rgba(255, 255, 255, 0);
-  padding: 20px 0;
-  text-align: center;
+  padding: 10px;
+  text-align: left;
 
   button:hover {
     color: #FFF;
@@ -118,19 +272,41 @@ export default {
   }
 
   .demo-right_menuBtn {
-    margin-top: 7px;
+    margin-left: 7px;
   }
 
   .demo-perspective_panel {
     position: absolute;
-    right: 60px;
+    right: 10px;
     z-index: 1;
     background: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 5px;
-    top: 20px;
-    width: 360px;
+    top: 70px;
+    width: 250px;
+    text-align: center;
 
+    .demo-perspective_inputPanle {
+      width: 180px;
+      margin: 5px auto;
+
+      .el-form-item {
+        margin-bottom: 12px !important;
+      }
+
+      ::v-deep(.el-form-item__label) {
+        line-height: 38px;
+      }
+
+      .demo-perspective_input {
+        margin: 5px 0;
+
+        ::v-deep(.el-input-group__append) {
+          padding: 0 10px;
+          width: 32px;
+        }
+      }
+    }
 
     .el-icon-close {
       font-size: 16px;
@@ -174,6 +350,7 @@ export default {
 
 .el-popper[x-placement^=bottom] {
   margin-top: 6px;
+  box-shadow: none;
 }
 
 .el-dropdown-menu--small {
