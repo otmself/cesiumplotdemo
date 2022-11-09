@@ -1,9 +1,12 @@
 <template>
-  <div id="cesiumContainer">
+  <div id="cesiumContainer" ref="map">
+    <div class="demo-map_menu" ref="mapmenu" v-show="mapMenuShow">
+      <div class="demo-map_menuItem">获取地点信息</div>
+    </div>
     <div class="demo-map_location">
       <div class="demo-map_locationItem" v-for="(item, index) in locations" :key="index">
-        <span>{{item}}</span>
-        <span>：{{moveLocation[index]}}</span>
+        <span>{{ item }}</span>
+        <span>：{{ moveLocation[index] }}</span>
       </div>
     </div>
   </div>
@@ -18,23 +21,13 @@ export default {
   data() {
     return {
       viewer: null,
-      locations:["经度", "纬度", "高度"],
-      moveLocation:[null, null, null],
+      locations: ["经度", "纬度", "高度"],
+      moveLocation: [null, null, null],
+      mapMenuShow: false,
     }
   },
   methods: {},
   mounted() {
-    // Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(
-    //     //-70, // 东
-    //     //0.0, // 南
-    //     //0, // 西
-    //     //90.0, // 北
-    //     //更改为中国区域的初始视角
-    //     80,
-    //     35,
-    //     81,
-    //     36
-    // );
     Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.2;
     // const Cesium = this.Cesium
     const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -87,8 +80,7 @@ export default {
         }
       }
     }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
-
-    handler.setInputAction(function (movement){
+    handler.setInputAction(function (movement) {
       let ellipsoid = viewer.scene.globe.ellipsoid;
       let cartesian = viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
       //获取高度
@@ -100,11 +92,18 @@ export default {
         let longitude = Cesium.Math.toDegrees(cartographic.longitude);
         let latitude = Cesium.Math.toDegrees(cartographic.latitude);
         self.moveLocation = [longitude.toFixed(5), latitude.toFixed(5), height];
-      }else {
+      } else {
         self.moveLocation = [null, null, height];
       }
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
     this.$emit("ready", viewer)
+    this.$refs.map.oncontextmenu = function (e) {
+      e.preventDefault();
+      if (e.button == 2) {
+        // self.$refs.
+        self.mapMenuShow = true;
+      }
+    }
     viewer.dataSources.add(Cesium.CzmlDataSource.load("./data/czml/meo.czml"))
   }
 }
@@ -118,7 +117,19 @@ export default {
   margin: 0;
   width: 100%;
   height: 100%;
-  .demo-map_location{
+
+  .demo-map_menu {
+    position: absolute;
+    z-index: 1;
+    left: 1000px;
+    border-radius: 5px;
+    padding: 5px;
+    background: rgba(5, 5, 65, 0.4);
+    font-size: 12px;
+    color: #e9eaed;
+  }
+
+  .demo-map_location {
     position: absolute;
     bottom: 2px;
     right: 0;
@@ -128,7 +139,8 @@ export default {
     padding: 4px;
     z-index: 1;
     font-size: 14px;
-    .demo-map_locationItem{
+
+    .demo-map_locationItem {
       margin: 0 2px;
       min-width: 120px;
     }
