@@ -1,16 +1,12 @@
 <template>
   <div id="cesiumContainer" ref="map">
-    <div class="demo-map_menu" ref="mapmenu" v-show="mapMenuShow">
+    <div class="demo-map_menu" ref="mapmenu" v-show="mapMenuShow" @click="getLocationInfo">
       <div class="demo-map_menuItem">获取地点信息</div>
     </div>
     <div class="demo-map_location">
       <div class="demo-map_locationItem" v-for="(item, index) in locations" :key="index">
         <span>{{ item }}</span>
         <span>：{{ moveLocation[index] }}</span>
-      </div>
-      <div class="demo-map_locationItem" v-for="(item, index) in locations" :key="index">
-        <span>{{ item }}</span>
-        <span>：{{ moveLocation1[index] }}</span>
       </div>
     </div>
   </div>
@@ -28,7 +24,6 @@ export default {
       locations: ["经度", "纬度", "高度"],
       moveLocation: [null, null, null],
       mapMenuShow: false,
-      moveLocation1: [null, null, null],
     }
   },
   methods: {
@@ -56,11 +51,19 @@ export default {
           //将弧度转为度的十进制度表示
           let longitude = Cesium.Math.toDegrees(cartographic.longitude);
           let latitude = Cesium.Math.toDegrees(cartographic.latitude);
-          this.moveLocation1 = [longitude.toFixed(5), latitude.toFixed(5), height]
+          this.moveLocation = [longitude.toFixed(5), latitude.toFixed(5), height]
         }
 
         // this.mouseCoords.updateCoordinatesFromCesium(this.viewer, position)
       }
+    },
+    onMouseRightClick(e) {
+      this.mapMenuShow = true;
+      this.$refs.mapmenu.style.left = e.position.x + "px";
+      this.$refs.mapmenu.style.top = e.position.y + "px";
+    },
+    getLocationInfo() {
+
     }
   },
   mounted() {
@@ -118,32 +121,26 @@ export default {
         }
       }
     }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    handler.setInputAction(this.onMouseRightClick, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
     //实时获取坐标
-    handler.setInputAction(function (movement) {
-      let ellipsoid = viewer.scene.globe.ellipsoid;
-      let cartesian = viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
-      //获取高度
-      let height = viewer.camera.positionCartographic.height.toFixed(2);
-      if (cartesian) {
-        //将笛卡尔坐标转换为地理坐标
-        let cartographic = ellipsoid.cartesianToCartographic(cartesian);
-        //将弧度转为度的十进制度表示
-        let longitude = Cesium.Math.toDegrees(cartographic.longitude);
-        let latitude = Cesium.Math.toDegrees(cartographic.latitude);
-        self.moveLocation = [longitude.toFixed(5), latitude.toFixed(5), height];
-      } else {
-        self.moveLocation = [null, null, height];
-      }
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+    // handler.setInputAction(function (movement) {
+    //   let ellipsoid = viewer.scene.globe.ellipsoid;
+    //   let cartesian = viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
+    //   //获取高度
+    //   let height = viewer.camera.positionCartographic.height.toFixed(2);
+    //   if (cartesian) {
+    //     //将笛卡尔坐标转换为地理坐标
+    //     let cartographic = ellipsoid.cartesianToCartographic(cartesian);
+    //     //将弧度转为度的十进制度表示
+    //     let longitude = Cesium.Math.toDegrees(cartographic.longitude);
+    //     let latitude = Cesium.Math.toDegrees(cartographic.latitude);
+    //     self.moveLocation = [longitude.toFixed(5), latitude.toFixed(5), height];
+    //   } else {
+    //     self.moveLocation = [null, null, height];
+    //   }
+    // }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
     this.viewer = viewer
     this.$emit("ready", viewer)
-    this.$refs.map.oncontextmenu = function (e) {
-      e.preventDefault();
-      if (e.button == 2) {
-        // self.$refs.
-        self.mapMenuShow = true;
-      }
-    }
     viewer._element.addEventListener('mousemove', this.onMouseMove, false)
     viewer.dataSources.add(Cesium.CzmlDataSource.load("./data/czml/meo.czml"))
   }
@@ -168,6 +165,7 @@ export default {
     background: rgba(5, 5, 65, 0.4);
     font-size: 12px;
     color: #e9eaed;
+    cursor: pointer;
   }
 
   .demo-map_location {
