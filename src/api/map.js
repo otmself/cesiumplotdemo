@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-export function save(lon, lat) {
+export function getLocationInfo(lon, lat) {
     let data = {
         "longitude": lon,
         "latitude": lat

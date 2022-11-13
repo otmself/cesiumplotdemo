@@ -15,6 +15,7 @@
 <script>
 import * as Cesium from "../../public/Cesium/Cesium";
 import CesiumPlot from "@/utils/plot";
+import {getLocationInfo} from "@/api/map";
 
 export default {
   name: "cesiumMap",
@@ -35,7 +36,7 @@ export default {
       if (clientX === this.lastMouseX && clientY === this.lastMouseY) {
         return
       }
-
+      this.mapMenuShow = false;
       this.lastMouseX = clientX
       this.lastMouseY = clientY
 
@@ -63,13 +64,30 @@ export default {
       this.$refs.mapmenu.style.top = e.position.y + "px";
     },
     getLocationInfo() {
-
+      let lon = this.moveLocation[0];
+      let lat = this.moveLocation[1];
+      this.mapMenuShow = false;
+      getLocationInfo(lon, lat).then(response => {
+        console.log(response)
+        if (response.status == 200){
+          let data = response.data;
+          this.$notify({
+            title: data.name,
+            message: '经度：' + lon + "，纬度：" + lat,
+            position: 'bottom-left',
+            duration: 0
+          })
+        }
+      })
     }
   },
   mounted() {
     Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.2;
     this.lastMouseX = -1
     this.lastMouseY = -1
+    document.oncontextmenu = function(){
+      return false;
+    }
     // const Cesium = this.Cesium
     const viewer = new Cesium.Viewer("cesiumContainer", {
       geocoder: false,
@@ -160,7 +178,6 @@ export default {
     position: absolute;
     z-index: 1;
     left: 1000px;
-    border-radius: 5px;
     padding: 5px;
     background: rgba(5, 5, 65, 0.4);
     font-size: 12px;
